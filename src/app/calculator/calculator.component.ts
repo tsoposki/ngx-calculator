@@ -68,7 +68,7 @@ export class CalculatorComponent implements OnDestroy {
             return result;
           }
         } else {
-          return updateLatestOperator(result, newOperator);
+          return updateLatestOperator(getLastCharOfString(result) === dot ? result + '0' : result, newOperator);
         }
       })
 
@@ -170,7 +170,11 @@ function createPreventEnterKeydown$(element): Observable<KeyboardEvent> {
 
 function canAppendDotInExpression(expression: string): boolean {
   const lastExpressionChar = getLastCharOfString(expression);
-  return isOperator(lastExpressionChar) || isNumber(parseInt(lastExpressionChar, 10)) && !isFloat(pluckLastNumberAsStringFromExpression(expression));
+  return (
+    isOperator(lastExpressionChar) ||
+    isNumber(parseInt(lastExpressionChar, 10)) &&
+    !isFloat(pluckLastNumberAsStringFromExpression(expression))
+  );
 }
 
 function isFloat(param: number | string): boolean {
