@@ -17,6 +17,7 @@ export class CalculatorComponent implements OnDestroy {
   resultSubj = new BehaviorSubject<string>('');
   numberInputSubj = new Subject<number>();
   operatorInputSubj = new Subject<Operator>();
+  dotInputSubj = new Subject<Dot>();
   @HostBinding() tabindex = 1;
   private _subs: Array<Subscription> = [];
   private _captureKey$: Observable<string> = createCaptureKey$(this._elRef.nativeElement).publishReplay(1).refCount();
@@ -25,7 +26,8 @@ export class CalculatorComponent implements OnDestroy {
     this._subs.push(
       this._createExpression$().subscribe(),
       this._deleteInputOnTriggers().subscribe(),
-      createPreventEnterKeydown$(this._elRef.nativeElement).subscribe()
+      createPreventEnterKeydown$(this._elRef.nativeElement).subscribe(),
+      this._captureDotOnTriggers$().subscribe()
     );
     this.result$ = this.resultSubj.asObservable().map(expressionToInputString);
     this.numberInputSubj.next(0);
@@ -38,37 +40,55 @@ export class CalculatorComponent implements OnDestroy {
   private _deleteInputOnTriggers = (): Observable<any> =>
     this._captureKey$
       .filter(key => (key === 'Backspace' || key === 'Delete') && this.resultSubj.value.length > 0)
-      .do(() => this.resultSubj.next(this.resultSubj.value.slice(0, this.resultSubj.value.length - 1)))
+      .withLatestFrom(this.resultSubj)
+      .do(([_, result]) => this.resultSubj.next(result.length === 1 ? '0' : result.slice(0, result.length - 1)))
 
   private _createExpression$ = (): Observable<string> =>
     this._updateExpressionOnTriggers()
       .do(val => this.resultSubj.next(val))
       .distinctUntilChanged()
 
+  private _updateExpressionWithNewNumber = (): Observable<string> =>
+    this._captureNumbersOnTriggers()
+      .withLatestFrom(this.resultSubj)
+      .map(([newNumber, result]) => {
+        return result === '0' ?
+          newNumber.toString() :
+          result + newNumber;
+      })
+
+  private _updateExpressionOnNewOperator = (): Observable<string> =>
+    this._captureOperatorsOnTriggers$()
+      .withLatestFrom(this.resultSubj)
+      .map(([newOperator, result]) => {
+        if (newOperator === '=') {
+          try {
+            return mathEval(result).toString();
+          } catch (err) {
+            return result;
+          }
+        } else {
+          return updateLatestOperator(result, newOperator);
+        }
+      })
+
+  private _updateExpressionOnNewDot = (): Observable<string> =>
+    Observable.merge(
+      this._captureDotOnTriggers$(),
+      this.dotInputSubj
+    )
+      .withLatestFrom(this.resultSubj)
+      .map(([_, expression]) =>
+        canAppendDotInExpression(expression) ?
+          (lastInputIsOperator(expression) ? expression + '0' + dot : expression + dot) :
+          expression
+      )
+
   private _updateExpressionOnTriggers = (): Observable<string> =>
     Observable.merge(
-      this._captureNumbersOnTriggers()
-        .withLatestFrom(this.resultSubj)
-        .map(([newNumber, result]) => {
-          const lastNumberFromExpression = pluckLastNumberFromExpression(result);
-          return lastInputIsOperator(result) ?
-            result + newNumber :
-            result.replace(lastNumberPattern, '') + parseFloat((lastNumberFromExpression || '') + newNumber.toString());
-        }),
-      this._captureOperatorsOnTriggers$()
-        .withLatestFrom(this.resultSubj)
-        .map(([newOperator, result]) => {
-          if (newOperator === '=') {
-            try {
-              const evaluatedResult = mathEval(result);
-              return Number.isInteger(evaluatedResult) ? evaluatedResult.toString() : evaluatedResult.toFixed(4);
-            } catch (err) {
-              return result;
-            }
-          } else {
-            return updateLatestOperator(result, newOperator);
-          }
-        })
+      this._updateExpressionWithNewNumber(),
+      this._updateExpressionOnNewOperator(),
+      this._updateExpressionOnNewDot()
     )
 
   private _captureNumbersOnTriggers = (): Observable<string> =>
@@ -82,6 +102,9 @@ export class CalculatorComponent implements OnDestroy {
       <Observable<Operator>>this._captureKey$.map(key => key === 'Enter' ? '=' : key).filter(isOperator),
       this.operatorInputSubj
     )
+
+  private _captureDotOnTriggers$ = (): Observable<Dot> =>
+    <Observable<Dot>>this._captureKey$.map(key => key === ',' ? dot : key).filter(val => val === dot)
 }
 
 function createCaptureKey$(element: any): Observable<string> {
@@ -106,7 +129,11 @@ function isNumber(obj: any): boolean {
 }
 
 function lastInputIsOperator(expression: string): boolean {
-  return isOperator(expression.substr(expression.length - 1));
+  return isOperator(getLastCharOfString(expression));
+}
+
+function getLastCharOfString(str: string): string {
+  return str.substr(str.length - 1);
 }
 
 function updateLatestOperator(expression: string, newOperator: Operator): string {
@@ -120,11 +147,11 @@ function updateLatestOperator(expression: string, newOperator: Operator): string
   );
 }
 
-function pluckLastNumberFromExpression(expression: string): number {
+function pluckLastNumberAsStringFromExpression(expression: string): string {
   const res = expression.match(lastNumberPattern);
   return (
     !!res ?
-      parseFloat(res[1]) :
+      res[1] :
       null
   );
 }
@@ -141,4 +168,19 @@ function createPreventEnterKeydown$(element): Observable<KeyboardEvent> {
     .do((e: any) => e.preventDefault());
 }
 
-const lastNumberPattern = /(\d+)(?!.*\d)/;
+function canAppendDotInExpression(expression: string): boolean {
+  const lastExpressionChar = getLastCharOfString(expression);
+  return isOperator(lastExpressionChar) || isNumber(parseInt(lastExpressionChar, 10)) && !isFloat(pluckLastNumberAsStringFromExpression(expression));
+}
+
+function isFloat(param: number | string): boolean {
+  if (typeof param === 'string') {
+    return param.indexOf('.') !== -1;
+  } else {
+    return Number(param) === param && param % 1 !== 0;
+  }
+}
+
+const lastNumberPattern = /(\d+(\.\d+)?)(?!.*\d)/;
+type Dot = '.';
+const dot: Dot = '.';
