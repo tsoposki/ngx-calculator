@@ -2,6 +2,7 @@ $bgColor: rgba(75, 75, 75, 0.65);
 
 :host {
   display: block;
+  height: 100%;
 }
 .calculator {
   border-radius: 5px;
@@ -45,9 +46,6 @@ $bgColor: rgba(75, 75, 75, 0.65);
   }
 
   .digit, .action {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     font-family: 'Eczar', serif !important;
     outline: none;
     font-size: 22px;

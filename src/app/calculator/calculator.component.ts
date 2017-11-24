@@ -1,4 +1,4 @@
-import {Component, OnDestroy} from '@angular/core';
+import {Component, ElementRef, HostBinding, OnDestroy} from '@angular/core';
 import {Observable} from 'rxjs/Rx';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {Subscription} from 'rxjs/Subscription';
@@ -17,16 +17,20 @@ export class CalculatorComponent implements OnDestroy {
   resultSubj = new BehaviorSubject<string>('');
   numberInputSubj = new Subject<number>();
   operatorInputSubj = new Subject<Operator>();
+  @HostBinding() tabindex = 1;
   private _subs: Array<Subscription> = [];
-  private _captureKey$: Observable<string> = createCaptureKey$(document).publishReplay(1).refCount();
+  private _captureKey$: Observable<string> = createCaptureKey$(this._elRef.nativeElement).publishReplay(1).refCount();
 
-  constructor() {
+  constructor(private _elRef: ElementRef) {
     this._subs.push(
       this._createExpression$().subscribe(),
-      this._deleteInputOnTriggers().subscribe()
+      this._deleteInputOnTriggers().subscribe(),
+      createPreventEnterKeydown$(this._elRef.nativeElement).subscribe()
     );
     this.result$ = this.resultSubj.asObservable().map(expressionToInputString);
     this.numberInputSubj.next(0);
+
+
   }
 
   ngOnDestroy() {
@@ -128,6 +132,12 @@ function expressionToInputString(expression: string): string {
   let input = expression.replace(new RegExp('\\*', 'g'), '&times;');
   input = input.replace(new RegExp('\\/', 'g'), '&divide;');
   return input;
+}
+
+function createPreventEnterKeydown$(element): Observable<KeyboardEvent> {
+  return Observable.fromEvent(element, 'keydown')
+    .filter((e: any) => e.key === 'Enter')
+    .do((e: any) => e.preventDefault());
 }
 
 const lastNumberPattern = /(\d+)(?!.*\d)/;

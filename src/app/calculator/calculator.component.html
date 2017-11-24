@@ -4,89 +4,89 @@
     [innerHtml]="result$ | async">
   </div>
   <div class="flexRow">
-    <div
+    <button
       (click)="numberInputSubj.next(7)"
       class="digit">
       7
-    </div>
-    <div
+    </button>
+    <button
       (click)="numberInputSubj.next(8)"
       class="digit">
       8
-    </div>
-    <div
+    </button>
+    <button
       (click)="numberInputSubj.next(9)"
       class="digit">
       9
-    </div>
-    <div
+    </button>
+    <button
       (click)="operatorInputSubj.next('*')"
       class="action">
       &times;
-    </div>
+    </button>
   </div>
 
   <div class="flexRow">
-    <div
+    <button
       (click)="numberInputSubj.next(4)"
       class="digit">
       4
-    </div>
-    <div
+    </button>
+    <button
       (click)="numberInputSubj.next(5)"
       class="digit">
       5
-    </div>
-    <div
+    </button>
+    <button
       (click)="numberInputSubj.next(6)"
       class="digit">
       6
-    </div>
-    <div
+    </button>
+    <button
       (click)="operatorInputSubj.next('-')"
       class="action">
        -
-    </div>
+    </button>
   </div>
 
   <div class="flexRow">
-    <div
+    <button
       (click)="numberInputSubj.next(1)"
       class="digit">
       1
-    </div>
-    <div
+    </button>
+    <button
       (click)="numberInputSubj.next(2)"
       class="digit">
       2
-    </div>
-    <div
+    </button>
+    <button
       (click)="numberInputSubj.next(3)"
       class="digit">
       3
-    </div>
-    <div
+    </button>
+    <button
       (click)="operatorInputSubj.next('+')"
       class="action">
       +
-    </div>
+    </button>
   </div>
 
   <div class="flexRow">
-    <div
+    <button
       (click)="numberInputSubj.next(0)"
       class="digit takeDouble">
       0
-    </div>
-    <div
+    </button>
+    <button
       (click)="operatorInputSubj.next('=')"
       class="action">
       =
-    </div>
-    <div
+    </button>
+    <button
       (click)="operatorInputSubj.next('/')"
       class="action">
       &divide;
-    </div>
+    </button>
   </div>
 </div>
