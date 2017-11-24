@@ -1,0 +1,92 @@
+<div class="calculator">
+  <div
+    class="result"
+    [innerHtml]="result$ | async">
+  </div>
+  <div class="flexRow">
+    <button
+      (click)="inputSubj.next('7')"
+      class="digit">
+      7
+    </button>
+    <button
+      (click)="inputSubj.next('8')"
+      class="digit">
+      8
+    </button>
+    <button
+      (click)="inputSubj.next('9')"
+      class="digit">
+      9
+    </button>
+    <button
+      (click)="inputSubj.next('*')"
+      class="action">
+      &times;
+    </button>
+  </div>
+
+  <div class="flexRow">
+    <button
+      (click)="inputSubj.next('4')"
+      class="digit">
+      4
+    </button>
+    <button
+      (click)="inputSubj.next('5')"
+      class="digit">
+      5
+    </button>
+    <button
+      (click)="inputSubj.next('6')"
+      class="digit">
+      6
+    </button>
+    <button
+      (click)="inputSubj.next('-')"
+      class="action">
+       -
+    </button>
+  </div>
+
+  <div class="flexRow">
+    <button
+      (click)="inputSubj.next('1')"
+      class="digit">
+      1
+    </button>
+    <button
+      (click)="inputSubj.next('2')"
+      class="digit">
+      2
+    </button>
+    <button
+      (click)="inputSubj.next('3')"
+      class="digit">
+      3
+    </button>
+    <button
+      (click)="inputSubj.next('+')"
+      class="action">
+      +
+    </button>
+  </div>
+
+  <div class="flexRow">
+    <button
+      (click)="inputSubj.next('0')"
+      class="digit takeDouble">
+      0
+    </button>
+    <button
+      (click)="inputSubj.next('=')"
+      class="action">
+      =
+    </button>
+    <button
+      (click)="inputSubj.next('/')"
+      class="action">
+      &divide;
+    </button>
+  </div>
+</div>

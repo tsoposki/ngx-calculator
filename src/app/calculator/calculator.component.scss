@@ -1,0 +1,75 @@
+$bgColor: rgba(75, 75, 75, 0.65);
+
+:host {
+  display: block;
+}
+.calculator {
+  border-radius: 5px;
+  background: $bgColor;
+  box-shadow: 0 1px 10px 5px $bgColor;
+
+  .flexRow {
+    display: flex;
+
+    &:last-of-type {
+      .digit, .action {
+        &:first-of-type {
+          border-bottom-left-radius: 5px;
+        }
+        &:last-of-type {
+          border-bottom-right-radius: 5px;
+        }
+      }
+    }
+
+    &:last-of-type {
+      .digit, .action {
+        &:not(.takeDouble) {
+          flex-basis: 25%;
+        }
+      }
+    }
+  }
+
+  .result {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    font-size: 25px;
+    font-weight: bold;
+    padding: 5px;
+    min-height: 55px;
+
+    color: white;
+  }
+
+  .digit, .action {
+    font-family: 'Eczar', serif !important;
+    outline: none;
+    font-size: 22px;
+    flex: 1;
+    cursor: pointer;
+    padding: 5px;
+    border: 1px solid $bgColor;
+    transition: .4s ease;
+    transition-property: background;
+
+    &.takeDouble {
+      flex: 2;
+      flex-basis: 50%;
+    }
+
+    &:hover {
+      background: none;
+    }
+  }
+  .digit {
+    background: #e0e0e0;
+    color: black;
+  }
+  .action {
+    background: #ff8c00;
+    color: white;
+  }
+}
