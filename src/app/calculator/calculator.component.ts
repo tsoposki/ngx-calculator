@@ -51,8 +51,14 @@ export class CalculatorComponent implements OnDestroy {
     this._captureNumbersOnTriggers()
       .withLatestFrom(this.resultSubj)
       .map(([newNumber, result]) => {
-        return result === '0' ?
-          newNumber.toString() :
+        const lastNumberAsStringFromExpression = pluckLastNumberAsStringFromExpression(result);
+        const lastCharOfResult = getLastCharOfString(result);
+        return (
+          parseFloat(lastNumberAsStringFromExpression) === 0 &&
+          !isFloat(lastNumberAsStringFromExpression) &&
+          isNumber(parseInt(lastCharOfResult, 10))
+        ) ?
+          result.substr(0, result.length - 1) + newNumber :
           result + newNumber;
       })
 
