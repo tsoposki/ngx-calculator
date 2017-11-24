@@ -3,6 +3,7 @@ import {Observable} from 'rxjs/Rx';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {Subscription} from 'rxjs/Subscription';
 import {eval as mathEval} from 'mathjs';
+import {Subject} from 'rxjs/Subject';
 
 type Operator = '*' | '-' | '+' | '/' | '=';
 
@@ -14,7 +15,8 @@ type Operator = '*' | '-' | '+' | '/' | '=';
 export class CalculatorComponent implements OnDestroy {
   result$: Observable<string>;
   resultSubj = new BehaviorSubject<string>('');
-  inputSubj = new BehaviorSubject<string>('0');
+  numberInputSubj = new Subject<number>();
+  operatorInputSubj = new Subject<Operator>();
   private _subs: Array<Subscription> = [];
   private _captureKey$: Observable<string> = createCaptureKey$(document).publishReplay(1).refCount();
 
@@ -24,6 +26,7 @@ export class CalculatorComponent implements OnDestroy {
       this._deleteInputOnTriggers().subscribe()
     );
     this.result$ = this.resultSubj.asObservable().map(expressionToInputString);
+    this.numberInputSubj.next(0);
   }
 
   ngOnDestroy() {
@@ -68,17 +71,15 @@ export class CalculatorComponent implements OnDestroy {
 
   private _captureNumbersOnTriggers = (): Observable<string> =>
     Observable.merge(
-      this._captureKey$,
-      this.inputSubj
+      this._captureKey$.map(key => parseInt(key, 10)).filter(isNumber),
+      this.numberInputSubj
     )
-      .map(key => parseInt(key, 10))
-      .filter(isNumber)
 
   private _captureOperatorsOnTriggers$ = (): Observable<Operator> =>
-    <Observable<Operator>>Observable.merge(
-      this._captureKey$.map(key => key === 'Enter' ? '=' : key),
-      this.inputSubj
-    ).filter(isOperator)
+    Observable.merge(
+      <Observable<Operator>>this._captureKey$.map(key => key === 'Enter' ? '=' : key).filter(isOperator),
+      this.operatorInputSubj
+    )
 }
 
 function createCaptureKey$(element: any): Observable<string> {
