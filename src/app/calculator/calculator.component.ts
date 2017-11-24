@@ -125,8 +125,8 @@ function pluckLastNumberFromExpression(expression: string): number {
 }
 
 function expressionToInputString(expression: string): string {
-  let input = expression.replace('*', '&times;');
-  input = input.replace('/', '&divide;');
+  let input = expression.replace(new RegExp('\\*', 'g'), '&times;');
+  input = input.replace(new RegExp('\\/', 'g'), '&divide;');
   return input;
 }
 
