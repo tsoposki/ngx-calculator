@@ -29,8 +29,6 @@ export class CalculatorComponent implements OnDestroy {
     );
     this.result$ = this.resultSubj.asObservable().map(expressionToInputString);
     this.numberInputSubj.next(0);
-
-
   }
 
   ngOnDestroy() {
@@ -112,6 +110,9 @@ function lastInputIsOperator(expression: string): boolean {
 }
 
 function updateLatestOperator(expression: string, newOperator: Operator): string {
+  if (expression === '' && newOperator !== '+' && newOperator !== '-') {
+    return expression;
+  }
   return (
     lastInputIsOperator(expression) ?
       expression.substr(0, expression.length - 1) + newOperator :
