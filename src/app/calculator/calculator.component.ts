@@ -26,8 +26,7 @@ export class CalculatorComponent implements OnDestroy {
     this._subs.push(
       this._createExpression$().subscribe(),
       this._deleteInputOnTriggers().subscribe(),
-      createPreventEnterKeydown$(this._elRef.nativeElement).subscribe(),
-      this._captureDotOnTriggers$().subscribe()
+      createPreventEnterKeydown$(this._elRef.nativeElement).subscribe()
     );
     this.result$ = this.resultSubj.asObservable().map(expressionToInputString);
     this.numberInputSubj.next(0);
