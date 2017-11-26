@@ -1,4 +1,4 @@
-import {Component, ElementRef, HostBinding, OnDestroy} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ElementRef, HostBinding, OnDestroy} from '@angular/core';
 import {Observable} from 'rxjs/Rx';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {Subscription} from 'rxjs/Subscription';
@@ -10,7 +10,8 @@ type Operator = '*' | '-' | '+' | '/' | '=';
 @Component({
   selector: 'app-calculator',
   templateUrl: './calculator.component.html',
-  styleUrls: ['./calculator.component.scss']
+  styleUrls: ['./calculator.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CalculatorComponent implements OnDestroy {
   result$: Observable<string>;

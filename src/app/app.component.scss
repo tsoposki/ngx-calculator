@@ -1,3 +1,12 @@
-app-calculator {
-  padding: 20px;
+app-root {
+  &:host {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    app-calculator {
+      padding: 20px;
+      flex: 1;
+    }
+  }
 }
