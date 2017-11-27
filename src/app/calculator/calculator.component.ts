@@ -2,7 +2,6 @@ import {ChangeDetectionStrategy, Component, ElementRef, HostBinding, OnDestroy} 
 import {Observable} from 'rxjs/Rx';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {Subscription} from 'rxjs/Subscription';
-import {eval as mathEval} from 'mathjs';
 import {Subject} from 'rxjs/Subject';
 
 type Operator = '*' | '-' | '+' | '/' | '=';
@@ -69,7 +68,7 @@ export class CalculatorComponent implements OnDestroy {
       .map(([newOperator, result]) => {
         if (newOperator === '=') {
           try {
-            return mathEval(result).toString();
+            return eval(result).toString();
           } catch (err) {
             return result;
           }
