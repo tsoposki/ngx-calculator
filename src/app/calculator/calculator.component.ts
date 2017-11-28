@@ -3,6 +3,7 @@ import {Observable} from 'rxjs/Rx';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {Subscription} from 'rxjs/Subscription';
 import {Subject} from 'rxjs/Subject';
+import {EventTargetLike} from 'rxjs/observable/FromEventObservable';
 
 type Operator = '*' | '-' | '+' | '/' | '=';
 
@@ -157,7 +158,7 @@ function pluckLastNumberAsStringFromExpression(expression: string): string {
   return (
     !!res ?
       res[1] :
-      null
+      ''
   );
 }
 
@@ -167,7 +168,7 @@ function expressionToInputString(expression: string): string {
   return input;
 }
 
-function createPreventEnterKeydown$(element): Observable<KeyboardEvent> {
+function createPreventEnterKeydown$(element: EventTargetLike): Observable<KeyboardEvent> {
   return Observable.fromEvent(element, 'keydown')
     .filter((e: any) => e.key === 'Enter')
     .do((e: any) => e.preventDefault());
