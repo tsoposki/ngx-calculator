@@ -55,9 +55,9 @@ export class CalculatorComponent implements OnDestroy {
         const lastNumberAsStringFromExpression = pluckLastNumberAsStringFromExpression(result);
         const lastCharOfResult = getLastCharOfString(result);
         return (
-          parseFloat(lastNumberAsStringFromExpression) === 0 &&
+          Number(lastNumberAsStringFromExpression) === 0 &&
           !isFloat(lastNumberAsStringFromExpression) &&
-          isNumber(parseInt(lastCharOfResult, 10))
+          !isNaN(Number(lastCharOfResult))
         ) ?
           result.substr(0, result.length - 1) + newNumber :
           result + newNumber;
@@ -69,7 +69,7 @@ export class CalculatorComponent implements OnDestroy {
       .map(([newOperator, result]) => {
         if (newOperator === '=') {
           try {
-            return eval(result).toString();
+            return String(eval(result));
           } catch (err) {
             return result;
           }
@@ -97,9 +97,9 @@ export class CalculatorComponent implements OnDestroy {
       this._updateExpressionOnNewDot()
     )
 
-  private _captureNumbersOnTriggers = (): Observable<string> =>
+  private _captureNumbersOnTriggers = (): Observable<number> =>
     Observable.merge(
-      this._captureKey$.map(key => parseInt(key, 10)).filter(isNumber),
+      this._captureKey$.map(key => Number(key)).filter(val => !isNaN(val)),
       this.numberInputSubj
     )
 
@@ -128,10 +128,6 @@ function isOperator(str: string): boolean {
     default:
       return false;
   }
-}
-
-function isNumber(obj: any): boolean {
-  return typeof obj === 'number' && !Number.isNaN(obj);
 }
 
 function lastInputIsOperator(expression: string): boolean {
@@ -178,7 +174,7 @@ function canAppendDotInExpression(expression: string): boolean {
   const lastExpressionChar = getLastCharOfString(expression);
   return (
     isOperator(lastExpressionChar) ||
-    isNumber(parseInt(lastExpressionChar, 10)) &&
+    !isNaN(Number(lastExpressionChar)) &&
     !isFloat(pluckLastNumberAsStringFromExpression(expression))
   );
 }
