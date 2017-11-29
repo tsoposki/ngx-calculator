@@ -74,3 +74,20 @@ import 'zone.js/dist/zone';  // Included with Angular CLI.
  * Need to import at least one locale-data with intl.
  */
 // import 'intl/locale-data/jsonp/en';
+
+(function stringIncludesPolyfill() {
+  if (!String.prototype.includes) {
+    String.prototype.includes = function(search, start) {
+      'use strict';
+      if (typeof start !== 'number') {
+        start = 0;
+      }
+
+      if (start + search.length > this.length) {
+        return false;
+      } else {
+        return this.indexOf(search, start) !== -1;
+      }
+    };
+  }
+})();

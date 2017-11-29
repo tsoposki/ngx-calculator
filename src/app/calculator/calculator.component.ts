@@ -181,7 +181,7 @@ function canAppendDotInExpression(expression: string): boolean {
 
 function isFloat(param: number | string): boolean {
   if (typeof param === 'string') {
-    return param.indexOf('.') !== -1;
+    return param.includes('.');
   } else {
     return Number(param) === param && param % 1 !== 0;
   }
